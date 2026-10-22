@@ -3,7 +3,7 @@ import { Phone, MessageSquare, Send, CheckCircle2, ShieldCheck, Clock, MapPin } 
 import { FIRM_INFO } from '../data/firmInfo.js';
 import { SERVICES } from '../data/servicesData.js';
 
-export default function ConsultationForm({ prefilledService = "" }) {
+export default function ConsultationForm({ prefilledService = "", isModal = false, onSuccessClose = null }) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -58,7 +58,7 @@ export default function ConsultationForm({ prefilledService = "" }) {
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitted(true);
-    }, 700);
+    }, 600);
   };
 
   const generateWhatsAppMessage = () => {
@@ -73,6 +73,241 @@ export default function ConsultationForm({ prefilledService = "" }) {
     return `https://wa.me/${FIRM_INFO.whatsappNumber}?text=${text}`;
   };
 
+  // Form body component reused in both modal and full-page layout
+  const formContent = (
+    <div>
+      {submitted ? (
+        <div className="py-6 text-center space-y-4 animate-in fade-in duration-300">
+          <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+            <CheckCircle2 className="w-7 h-7" />
+          </div>
+
+          <h3 className="font-serif text-2xl font-bold text-[#0B1325]">
+            Consultation Request Received
+          </h3>
+
+          <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+            Thank you, <strong>{formData.name}</strong>. A senior tax advisor from our Gandhipuram office will call you at <strong className="font-mono">{formData.phone}</strong> within 2 business hours.
+          </p>
+
+          <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E5E0D5] text-left text-xs space-y-1.5 max-w-md mx-auto mt-4">
+            <div className="font-semibold text-slate-800">Consultation Summary:</div>
+            <div className="text-slate-600">Service: <span className="font-medium text-slate-900">{formData.serviceNeeded}</span></div>
+            {formData.businessName && <div className="text-slate-600">Business: <span className="font-medium text-slate-900">{formData.businessName}</span></div>}
+            <div className="text-slate-500 text-[11px] pt-1.5 border-t border-slate-200">
+              For urgent deadlines, you may also dispatch this request directly over WhatsApp.
+            </div>
+          </div>
+
+          <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+            <a
+              href={generateWhatsAppMessage()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>Send via WhatsApp as well</span>
+            </a>
+
+            {isModal && onSuccessClose && (
+              <button
+                type="button"
+                onClick={onSuccessClose}
+                className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs cursor-pointer"
+              >
+                Close Window
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} noValidate className="space-y-3.5">
+          
+          {!isModal && (
+            <div className="border-b border-slate-100 pb-3 mb-2">
+              <h3 className="font-serif text-2xl font-bold text-[#0B1325]">
+                Request a Free Compliance Consultation
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                No spam. Your details remain strictly confidential under standard client privilege.
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Full Name */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g. R. Karthikeyan"
+                className={`w-full px-3 py-2 text-xs text-slate-900 bg-[#FAF9F5] border rounded-lg outline-none transition-colors ${
+                  errors.name ? "border-red-500 bg-red-50/20" : "border-[#D5CEBF] focus:border-[#0B1325]"
+                }`}
+              />
+              {errors.name && <p className="text-[11px] text-red-600 mt-0.5">{errors.name}</p>}
+            </div>
+
+            {/* Phone Number */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
+                Mobile Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+91 98765 43210"
+                className={`w-full px-3 py-2 text-xs text-slate-900 bg-[#FAF9F5] border rounded-lg outline-none transition-colors ${
+                  errors.phone ? "border-red-500 bg-red-50/20" : "border-[#D5CEBF] focus:border-[#0B1325]"
+                }`}
+              />
+              {errors.phone && <p className="text-[11px] text-red-600 mt-0.5">{errors.phone}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Business Name & City */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
+                Business Name & City
+              </label>
+              <input
+                type="text"
+                value={formData.businessName}
+                onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                placeholder="e.g. Coimbatore Pumps, Gandhipuram"
+                className="w-full px-3 py-2 text-xs text-slate-900 bg-[#FAF9F5] border border-[#D5CEBF] focus:border-[#0B1325] rounded-lg outline-none transition-colors"
+              />
+            </div>
+
+            {/* Email Address */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
+                Email Address (Optional)
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="name@company.com"
+                className={`w-full px-3 py-2 text-xs text-slate-900 bg-[#FAF9F5] border rounded-lg outline-none transition-colors ${
+                  errors.email ? "border-red-500 bg-red-50/20" : "border-[#D5CEBF] focus:border-[#0B1325]"
+                }`}
+              />
+              {errors.email && <p className="text-[11px] text-red-600 mt-0.5">{errors.email}</p>}
+            </div>
+          </div>
+
+          {/* Service Needed Dropdown */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-800 mb-1">
+              Primary Service Required <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.serviceNeeded}
+              onChange={(e) => setFormData({ ...formData, serviceNeeded: e.target.value })}
+              className="w-full px-3 py-2 text-xs text-slate-900 bg-[#FAF9F5] border border-[#D5CEBF] focus:border-[#0B1325] rounded-lg outline-none cursor-pointer"
+            >
+              {SERVICES.map((s) => (
+                <option key={s.id} value={s.title}>
+                  {s.title} ({s.categoryLabel})
+                </option>
+              ))}
+              <option value="General Tax & Statutory Notice Advisory">
+                General Tax / Scrutiny Notice Resolution
+              </option>
+              <option value="Comprehensive Monthly Compliance Retainer">
+                Comprehensive Monthly Compliance Retainer
+              </option>
+            </select>
+          </div>
+
+          {/* Message / Notice Details */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-800 mb-1">
+              Notes or Pending Notice Details (Optional)
+            </label>
+            <textarea
+              rows={2}
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              placeholder="Describe turnover, return period, or specific questions..."
+              className="w-full px-3 py-2 text-xs text-slate-900 bg-[#FAF9F5] border border-[#D5CEBF] focus:border-[#0B1325] rounded-lg outline-none transition-colors"
+            />
+          </div>
+
+          {/* Spam Protection Math Verification */}
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-lg bg-[#FAF9F5] border border-[#E5E0D5]">
+              <div className="text-xs text-slate-700">
+                <span className="font-semibold">Security Check:</span> What is{" "}
+                <span className="font-mono font-bold text-[#0B1325]">
+                  {captchaChallenge.num1} + {captchaChallenge.num2}
+                </span>
+                ?
+              </div>
+              <div className="w-24">
+                <input
+                  type="number"
+                  required
+                  value={formData.captchaAnswer}
+                  onChange={(e) => setFormData({ ...formData, captchaAnswer: e.target.value })}
+                  placeholder="Answer"
+                  className={`w-full px-2 py-1 text-xs text-center font-mono text-slate-900 bg-white border rounded outline-none ${
+                    errors.captchaAnswer ? "border-red-500" : "border-[#D5CEBF]"
+                  }`}
+                />
+              </div>
+            </div>
+            {errors.captchaAnswer && (
+              <p className="text-[11px] text-red-600 mt-1">{errors.captchaAnswer}</p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-1">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 px-6 text-xs font-bold uppercase tracking-wider text-[#0B1325] bg-[#C5A059] hover:bg-[#B38E46] active:bg-[#9E7B35] rounded-lg transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <span>Validating Request...</span>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Book Free Compliance Consultation</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="text-center pt-1">
+            <div className="text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#8A7242]" />
+              <span>Office: No 721/2, Venky Complex, Gandhipuram, Coimbatore 641012</span>
+            </div>
+          </div>
+
+        </form>
+      )}
+    </div>
+  );
+
+  // If in modal mode, return just the clean card content
+  if (isModal) {
+    return formContent;
+  }
+
+  // Full-page section for the homepage footer band
   return (
     <section id="contact" className="py-20 bg-[#0B1325] text-white relative overflow-hidden bg-ledger-dark">
       {/* Decorative architectural glow */}
@@ -164,236 +399,7 @@ export default function ConsultationForm({ prefilledService = "" }) {
 
           {/* Right Column: Lead Form or Success State */}
           <div className="lg:col-span-7 bg-white text-slate-900 rounded-2xl p-7 sm:p-10 shadow-2xl border border-slate-200">
-            {submitted ? (
-              <div className="py-8 text-center space-y-4 animate-in fade-in duration-300">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#0B1325]">
-                  Consultation Request Received
-                </h3>
-
-                <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                  Thank you, <strong>{formData.name}</strong>. A senior tax advisor from our Gandhipuram office will call you at <strong className="font-mono">{formData.phone}</strong> within 2 business hours.
-                </p>
-
-                <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#E5E0D5] text-left text-xs space-y-2 max-w-md mx-auto mt-6">
-                  <div className="font-semibold text-slate-800">Consultation Reference:</div>
-                  <div className="text-slate-600">Service: <span className="font-medium text-slate-900">{formData.serviceNeeded}</span></div>
-                  {formData.businessName && <div className="text-slate-600">Business: <span className="font-medium text-slate-900">{formData.businessName}</span></div>}
-                  <div className="text-slate-500 text-[11px] pt-2 border-t border-slate-200">
-                    If this is urgent (e.g. departmental notice or filing due today), you may also dispatch this request directly over WhatsApp.
-                  </div>
-                </div>
-
-                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <a
-                    href={generateWhatsAppMessage()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Send via WhatsApp as well</span>
-                  </a>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmitted(false);
-                      setFormData({
-                        name: "",
-                        phone: "",
-                        email: "",
-                        businessName: "",
-                        serviceNeeded: "GST Filing & Reconciliation",
-                        message: "",
-                        captchaAnswer: ""
-                      });
-                    }}
-                    className="text-xs text-slate-600 hover:text-slate-900 underline"
-                  >
-                    Submit another enquiry
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                
-                <div className="border-b border-slate-100 pb-4 mb-2">
-                  <h3 className="font-serif text-2xl font-bold text-[#0B1325]">
-                    Request a Free Compliance Consultation
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    No spam. Your details remain strictly confidential under standard client privilege.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Full Name */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
-                      Full Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. R. Karthikeyan"
-                      className={`w-full px-3.5 py-2.5 text-xs text-slate-900 bg-[#FAF9F5] border rounded-lg outline-none transition-colors ${
-                        errors.name ? "border-red-500 bg-red-50/20" : "border-[#D5CEBF] focus:border-[#0B1325]"
-                      }`}
-                    />
-                    {errors.name && <p className="text-[11px] text-red-600 mt-1">{errors.name}</p>}
-                  </div>
-
-                  {/* Phone Number */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
-                      Mobile Number <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+91 98765 43210"
-                      className={`w-full px-3.5 py-2.5 text-xs text-slate-900 bg-[#FAF9F5] border rounded-lg outline-none transition-colors ${
-                        errors.phone ? "border-red-500 bg-red-50/20" : "border-[#D5CEBF] focus:border-[#0B1325]"
-                      }`}
-                    />
-                    {errors.phone && <p className="text-[11px] text-red-600 mt-1">{errors.phone}</p>}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Business Name & City */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
-                      Business / Firm Name & City
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.businessName}
-                      onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                      placeholder="e.g. Coimbatore Pumps & Valves, Gandhipuram"
-                      className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-[#FAF9F5] border border-[#D5CEBF] focus:border-[#0B1325] rounded-lg outline-none transition-colors"
-                    />
-                  </div>
-
-                  {/* Email Address */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
-                      Email Address (Optional)
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="name@company.com"
-                      className={`w-full px-3.5 py-2.5 text-xs text-slate-900 bg-[#FAF9F5] border rounded-lg outline-none transition-colors ${
-                        errors.email ? "border-red-500 bg-red-50/20" : "border-[#D5CEBF] focus:border-[#0B1325]"
-                      }`}
-                    />
-                    {errors.email && <p className="text-[11px] text-red-600 mt-1">{errors.email}</p>}
-                  </div>
-                </div>
-
-                {/* Service Needed Dropdown */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-800 mb-1">
-                    Primary Service Required <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={formData.serviceNeeded}
-                    onChange={(e) => setFormData({ ...formData, serviceNeeded: e.target.value })}
-                    className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-[#FAF9F5] border border-[#D5CEBF] focus:border-[#0B1325] rounded-lg outline-none cursor-pointer"
-                  >
-                    {SERVICES.map((s) => (
-                      <option key={s.id} value={s.title}>
-                        {s.title} ({s.categoryLabel})
-                      </option>
-                    ))}
-                    <option value="General Tax & Statutory Notice Advisory">
-                      General Tax / Scrutiny Notice Resolution
-                    </option>
-                    <option value="Comprehensive Monthly Compliance Retainer">
-                      Comprehensive Monthly Compliance Retainer
-                    </option>
-                  </select>
-                </div>
-
-                {/* Message / Notice Details */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-800 mb-1">
-                    Details of Enquiry or Pending Notice (Optional)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Describe your current turnover, pending return date, or specific query..."
-                    className="w-full px-3.5 py-2 text-xs text-slate-900 bg-[#FAF9F5] border border-[#D5CEBF] focus:border-[#0B1325] rounded-lg outline-none transition-colors"
-                  />
-                </div>
-
-                {/* Spam Protection Math Verification */}
-                <div className="pt-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-[#FAF9F5] border border-[#E5E0D5]">
-                    <div className="text-xs text-slate-700">
-                      <span className="font-semibold">Security Check:</span> What is{" "}
-                      <span className="font-mono font-bold text-[#0B1325]">
-                        {captchaChallenge.num1} + {captchaChallenge.num2}
-                      </span>
-                      ?
-                    </div>
-                    <div className="w-24">
-                      <input
-                        type="number"
-                        required
-                        value={formData.captchaAnswer}
-                        onChange={(e) => setFormData({ ...formData, captchaAnswer: e.target.value })}
-                        placeholder="Answer"
-                        className={`w-full px-2.5 py-1.5 text-xs text-center font-mono text-slate-900 bg-white border rounded outline-none ${
-                          errors.captchaAnswer ? "border-red-500" : "border-[#D5CEBF]"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                  {errors.captchaAnswer && (
-                    <p className="text-[11px] text-red-600 mt-1">{errors.captchaAnswer}</p>
-                  )}
-                </div>
-
-                {/* Submit Button */}
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3.5 px-6 text-xs font-bold uppercase tracking-wider text-[#0B1325] bg-[#C5A059] hover:bg-[#B38E46] active:bg-[#9E7B35] rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <span>Validating Request...</span>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Book Free Compliance Consultation</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                <div className="text-center pt-2">
-                  <div className="text-[11px] text-slate-500 flex items-center justify-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#8A7242]" />
-                    <span>Gandhipuram Office: No 721/2, Venky Complex, Coimbatore 641012</span>
-                  </div>
-                </div>
-
-              </form>
-            )}
+            {formContent}
           </div>
 
         </div>
