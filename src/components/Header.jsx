@@ -55,10 +55,10 @@ export default function Header({ onOpenConsultation, onSelectService, activeServ
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top Bar Contract: Zone 1 (Brand) - Zone 2 (Nav Links) - Zone 3 (Action) */}
-          <div className="flex items-center justify-between gap-8">
+          {/* Top Bar: Responsive flex container with appropriate spacing */}
+          <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8">
             
-            {/* Zone 1: Brand Wordmark (Single text element with refined crest) */}
+            {/* Zone 1: Brand Wordmark */}
             <a 
               href="/" 
               onClick={(e) => {
@@ -68,16 +68,16 @@ export default function Header({ onOpenConsultation, onSelectService, activeServ
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className="group flex items-center gap-3 text-slate-900 whitespace-nowrap shrink-0"
+              className="group flex items-center gap-2 sm:gap-3 text-slate-900 whitespace-nowrap shrink-0"
             >
-              <div className="w-10 h-10 rounded-lg bg-[#0B1325] flex items-center justify-center border border-[#C5A059]/40 shadow-xs group-hover:border-[#C5A059] transition-colors">
-                <span className="font-serif text-[#C5A059] text-xl font-bold tracking-wider">A2Z</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#0B1325] flex items-center justify-center border border-[#C5A059]/40 shadow-xs group-hover:border-[#C5A059] transition-colors shrink-0">
+                <span className="font-serif text-[#C5A059] text-base sm:text-xl font-bold tracking-wider">A2Z</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#0B1325] leading-none">
+                <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight text-[#0B1325] leading-none">
                   A2Z Associates
                 </span>
-                <span className="text-[10px] uppercase tracking-widest text-[#8A7242] font-semibold mt-1">
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-[#8A7242] font-semibold mt-0.5 sm:mt-1">
                   Tax & Compliance
                 </span>
               </div>
@@ -206,35 +206,43 @@ export default function Header({ onOpenConsultation, onSelectService, activeServ
               </a>
             </nav>
 
-            {/* Zone 3: Primary Action */}
-            <div className="flex items-center gap-3 shrink-0">
-              {/* Phone direct */}
+            {/* Zone 3: Primary Action & Mobile Hamburger */}
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+              {/* Phone direct (tablets and desktops) */}
               <a
                 href={FIRM_INFO.phoneCallUrl}
-                className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-800 hover:text-[#0B1325] px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors whitespace-nowrap"
+                className="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-800 hover:text-[#0B1325] px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors whitespace-nowrap"
                 title="Call Coimbatore Office"
               >
                 <Phone className="w-3.5 h-3.5 text-[#C5A059]" />
                 <span className="tabular-nums font-mono">{FIRM_INFO.phoneDisplay}</span>
               </a>
 
-              {/* Gold "Book Free Consultation" Button */}
+              {/* Consultation Button: Full text on sm+, compact 'Consult' on mobile */}
               <button
                 type="button"
                 onClick={onOpenConsultation}
-                className="px-4 py-2 text-xs font-semibold tracking-wide text-[#0B1325] bg-[#C5A059] hover:bg-[#B38E46] active:bg-[#9E7B35] rounded-md transition-all shadow-xs whitespace-nowrap cursor-pointer"
+                className="hidden sm:inline-flex px-3.5 py-2 text-xs font-semibold tracking-wide text-[#0B1325] bg-[#C5A059] hover:bg-[#B38E46] active:bg-[#9E7B35] rounded-md transition-all shadow-xs whitespace-nowrap cursor-pointer"
               >
                 Book Free Consultation
               </button>
 
-              {/* Mobile Menu Hamburger */}
+              <button
+                type="button"
+                onClick={onOpenConsultation}
+                className="sm:hidden px-2.5 py-1.5 text-xs font-bold tracking-wide text-[#0B1325] bg-[#C5A059] hover:bg-[#B38E46] rounded-md transition-all whitespace-nowrap cursor-pointer shrink-0"
+              >
+                Consult
+              </button>
+
+              {/* Mobile Menu Hamburger (Always visible on mobile without horizontal scroll) */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-md"
+                className="lg:hidden p-2 text-slate-800 hover:text-slate-900 hover:bg-slate-100 rounded-lg shrink-0 cursor-pointer touch-manipulation border border-slate-200 sm:border-transparent"
                 aria-label="Toggle navigation menu"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
             </div>
 
