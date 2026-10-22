@@ -7,10 +7,12 @@ Official website for **A2Z Associates**, Gandhipuram, Coimbatore.
 This repository is configured with automated GitHub Actions deployment.
 
 ### Step 1: Enable GitHub Pages in your GitHub Repository
-1. Go to your repository on GitHub.
+1. Go to your repository on GitHub (`github.com/sankaraxi/a2z`).
 2. Click **Settings** (tab at the top right of the repo).
 3. In the left sidebar, click **Pages** (under the "Code and automation" section).
-4. Under **Build and deployment** &rarr; **Source**, select **"GitHub Actions"** (do NOT select "Deploy from a branch").
+4. Under **Build and deployment** &rarr; **Source**:
+   - Choose **"GitHub Actions"** (Recommended).
+   - *Note: If you prefer branch mode, you can select branch `gh-pages` and folder `/ (root)` because the action automatically publishes to both.*
 
 ### Step 2: Push your code or Run the Action
 - Any push to `main` or `master` will automatically trigger `.github/workflows/deploy.yml`.
